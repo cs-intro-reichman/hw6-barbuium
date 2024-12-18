@@ -120,7 +120,7 @@ public class Runigram {
 		int b = pixel.getBlue();
 
 		int lum = (int) (0.299 * r + 0.587 * g + 0.114 * b);
-
+		lum =  Math.max(0, Math.min(255, lum));
 		return new Color(lum, lum, lum);
 	}
 	
@@ -138,7 +138,6 @@ public class Runigram {
 				grayScaledImage[i][j] = luminance(image[i][j]);
 			}
 		}
-
 		return grayScaledImage;
 	}	
 	
@@ -154,10 +153,8 @@ public class Runigram {
 		
 		for (int i = 0; i < width; i++) {
             for (int j = 0; j < height; j++) {
-                // Calculate the corresponding pixel in the original image
-                int srcX = (int) ((i * (float) w0) / width);
-                int srcY = (int) ((j * (float) h0) / height);
-                // Set the pixel value in the scaled image
+                int srcX = (int) Math.min((i * w0) / width, w0 - 1);
+                int srcY = (int) Math.min((j * h0) / height, h0 - 1);
                 scaledImage[i][j] = image[srcX][srcY];
 			}
 		}
@@ -186,6 +183,10 @@ public class Runigram {
         int g = (int) Math.round(alpha * g1 + (1 - alpha) * g2);
         int b = (int) Math.round(alpha * b1 + (1 - alpha) * b2);
 
+		r = Math.max(0, Math.min(255, r));
+		g = Math.max(0, Math.min(255, g));
+    	b = Math.max(0, Math.min(255, b));
+
         return new Color(r, g, b);
 	}
 	
@@ -197,6 +198,10 @@ public class Runigram {
 	 */
 	public static Color[][] blend(Color[][] image1, Color[][] image2, double alpha) {
 		//// Replace the following statement with your code
+		if (image1.length != image2.length || image1[0].length != image2[0].length) {
+			throw new IllegalArgumentException("Images must have the same dimensions.");
+		}
+		
 		int height = image1.length;
         int width = image1[0].length;
         Color[][] blendedImage = new Color[height][width];
@@ -218,7 +223,11 @@ public class Runigram {
                 int r = (int) Math.round(alpha * r1 + (1 - alpha) * r2);
                 int g = (int) Math.round(alpha * g1 + (1 - alpha) * g2);
                 int b = (int) Math.round(alpha * b1 + (1 - alpha) * b2);
-                blendedImage[i][j] = new Color(r, g, b);
+                
+				r = Math.max(0, Math.min(255, r));
+           		g = Math.max(0, Math.min(255, g));
+            	b = Math.max(0, Math.min(255, b));
+				blendedImage[i][j] = new Color(r, g, b);
 			}
 		}
 		return blendedImage;
