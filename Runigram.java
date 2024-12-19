@@ -120,8 +120,8 @@ public class Runigram {
 		int b = pixel.getBlue();
 
 		int lum = (int) (0.299 * r + 0.587 * g + 0.114 * b);
-		lum =  Math.max(0, Math.min(255, lum));
-		return new Color(lum, lum, lum);
+		Color newPixel =  new Color(lum, lum, lum);
+		return newPixel;
 	}
 	
 	/**
@@ -133,8 +133,8 @@ public class Runigram {
     	int numCols = image[0].length;
     	Color[][] grayScaledImage = new Color[numRows][numCols];
 
-		for (int i = 0; i < numRows; i++) {
-			for (int j = 0; j < numCols; j++){
+		for (int i = 0; i < grayScaledImage.length; i++) {
+			for (int j = 0; j < grayScaledImage[0].length; j++){
 				grayScaledImage[i][j] = luminance(image[i][j]);
 			}
 		}
@@ -158,7 +158,7 @@ public class Runigram {
                 scaledImage[i][j] = image[srcX][srcY];
 			}
 		}
-
+		print(scaledImage);
 		return scaledImage;
 	}
 	
@@ -170,25 +170,18 @@ public class Runigram {
 	 */
 	public static Color blend(Color c1, Color c2, double alpha) {
 		//// Replace the following statement with your code
-		int r1 = c1.getRed();
-        int g1 = c1.getGreen();
-        int b1 = c1.getBlue();
-
-        int r2 = c2.getRed();
-        int g2 = c2.getGreen();
-        int b2 = c2.getBlue();
-
-        // Calculate the blended RGB values using the formula
-        int r = (int) Math.round(alpha * r1 + (1 - alpha) * r2);
-        int g = (int) Math.round(alpha * g1 + (1 - alpha) * g2);
-        int b = (int) Math.round(alpha * b1 + (1 - alpha) * b2);
-
-		r = Math.max(0, Math.min(255, r));
-		g = Math.max(0, Math.min(255, g));
-    	b = Math.max(0, Math.min(255, b));
-
-        return new Color(r, g, b);
+		if (alpha > 1.0)alpha = 1.0;
+		if (alpha < 0.0)alpha = 0.0;
+		int r=calculatedV(c1.getRed(), c2.getRed(), alpha);
+		int g=calculatedV(c1.getGreen(), c2.getGreen(), alpha);
+		int b=calculatedV(c1.getBlue(), c2.getBlue(), alpha);
+		Color blendColor= new Color(r,g,b);
+			return blendColor;
 	}
+
+	public static int calculatedV(int v1, int v2, double alpha) {
+		return (int) (alpha * v1 + (1 - alpha) * v2);
+	} 
 	
 	/**
 	 * Cosntructs and returns an image which is the blending of the two given images.
@@ -198,36 +191,13 @@ public class Runigram {
 	 */
 	public static Color[][] blend(Color[][] image1, Color[][] image2, double alpha) {
 		//// Replace the following statement with your code
-		if (image1.length != image2.length || image1[0].length != image2[0].length) {
-			throw new IllegalArgumentException("Images must have the same dimensions.");
-		}
 		
 		int height = image1.length;
         int width = image1[0].length;
         Color[][] blendedImage = new Color[height][width];
 		for (int i = 0; i < height; i++) {
-            for (int j = 0; j < width; j++) {
-                Color c1 = image1[i][j];
-                Color c2 = image2[i][j];
-
-                // Blend the RGB values using the alpha formula
-                int r1 = c1.getRed();
-                int g1 = c1.getGreen();
-                int b1 = c1.getBlue();
-
-                int r2 = c2.getRed();
-                int g2 = c2.getGreen();
-                int b2 = c2.getBlue();
-
-                // Compute the blended RGB values
-                int r = (int) Math.round(alpha * r1 + (1 - alpha) * r2);
-                int g = (int) Math.round(alpha * g1 + (1 - alpha) * g2);
-                int b = (int) Math.round(alpha * b1 + (1 - alpha) * b2);
-                
-				r = Math.max(0, Math.min(255, r));
-           		g = Math.max(0, Math.min(255, g));
-            	b = Math.max(0, Math.min(255, b));
-				blendedImage[i][j] = new Color(r, g, b);
+            for (int j = 0; j < width; j++) {				
+				blendedImage[i][j] = blend(image1[i][j], image2[i][j], alpha);
 			}
 		}
 		return blendedImage;
